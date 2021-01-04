@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<!-- TemplateBeginEditable name="doctitle" -->
+	<title></title>
+	<!-- TemplateEndEditable -->
+	<link rel="stylesheet" type="text/css" href="/admin/common/css/common.css?release=___RELEASE___"/>
+	<!-- TemplateBeginEditable name="head" -->
+	<!-- TemplateEndEditable -->
+</head>
+<body>
+
+<div id="container">
+	<header>
+		<div>
+			<h1><a href="/"><img src="/common/img/logo.png" alt="logo"></a></h1>
+			<nav id="navigation">
+				<ul class="menu">
+					___SIDE_MENU___
+				</ul>
+			</nav>
+		</div>
+	</header>
+	<!-- TemplateBeginEditable name="contents" -->
+	<!-- TemplateEndEditable -->
+	<div id="footer_space">space</div>
+</div>
+<footer>
+	<small>&copy; FUJI KEIZAI CO., LTD. All rights reserved.</small>
+</footer>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="/admin/js/common.js?release=___RELEASE___"></script>
+<!-- TemplateBeginEditable name="EditJs" -->
+<!-- TemplateEndEditable -->
+</body>
+</html>

@@ -1,0 +1,184 @@
+<?php
+/*-----------------------------------------------------------------------------
+ *	Lightweight framework Rev 1.0
+ *-----------------------------------------------------------------------------
+ * 2016-02-04 : initial version Hide
+ *	
+ * account dao
+ * 
+ * システム管理者とJBS運用者を扱うdao
+ * 旧システムには存在しないテーブルを扱う
+ * 
+ * userContainerが参照するデータを管理する
+ * 
+ * mysql の sysuser に plain text でパスワードをいれると認証前にcryptしてくれ
+ * るので、強制初期化が必要なら plain text で更新すると簡単。
+ * 
+ *----------------------------------------------------------------------------*/
+
+class user_dao extends DBIO {
+    
+    /*-------------------------------------------------------------------------
+     * パスワードをctypt
+     *------------------------------------------------------------------------*/
+	function crypt($s){
+		return password_hash($s,PASSWORD_DEFAULT);
+	}
+    /*-------------------------------------------------------------------------
+     * ctyptされているか
+     *------------------------------------------------------------------------*/
+	function iscrypted($h){
+		return $h[0] == "$" ;
+	}
+    /*-------------------------------------------------------------------------
+     * パスワードの比較(時間攻撃に耐性がある）
+     *------------------------------------------------------------------------*/
+	function passwordVerify($plain , $hash){
+		return password_verify($plain,$hash);
+	}
+    /*-------------------------------------------------------------------------
+     * 平文パスワードを暗号化
+     *------------------------------------------------------------------------*/
+	function ctyptPassword($user){
+		$con = new DBIO();
+		$con->connect();
+		
+		$sql = "select * from sysuser where username=?";
+		$prm = array($user);
+		$con->query($sql,$prm);
+		$r   = $con->fetch();
+
+		if($r === false || $this->iscrypted($r["password"])){
+			return false ;
+		}
+			
+		$epwd = $this->crypt($r["password"]);
+		$sql = "update sysuser set password=? where serial=?" ;
+		$prm = array($epwd,$r["serial"]);
+		$con->query($sql,$prm);
+		return true ;
+	}
+    /*-------------------------------------------------------------------------
+     * ユーザー情報を取得する
+     *------------------------------------------------------------------------*/
+	function getUserInfo($user){
+		//	plaintext -> crypt password
+		$this->ctyptPassword($user);
+
+		$con = new DBIO();
+		$con->connect();
+		$sql = "select * from sysuser where username=?" ;
+		$prm = array($user);
+		$con->query($sql,$prm);
+		$r = $con->fetch();
+		if($r === false){
+			return false ;
+		}
+		return $r;
+	}
+    /*-------------------------------------------------------------------------
+     * パスワードを取得する
+     *------------------------------------------------------------------------*/
+	function getPassword($user){
+		//	plaintext -> crypt password
+		$this->ctyptPassword($user);
+
+		$con = new DBIO();
+		$con->connect();
+		$sql = "select password from sysuser where username=?" ;
+		$prm = array($user);
+		$con->query($sql,$prm);
+		$r = $con->fetch();
+		if($r === false){
+			return false ;
+		}
+		return $r["password"];
+	}
+    /*-------------------------------------------------------------------------
+     * 認証されているかを取得する
+     *------------------------------------------------------------------------*/
+	//	auth check
+	function authCheck($user,$pass){
+		return $this->passwordVerify($pass , $this->getPassword($user)	) ;
+	}
+    /*-------------------------------------------------------------------------
+     * 全ユーザーリストを得る
+     *------------------------------------------------------------------------*/
+	function getAllUser(){
+		$con = new DBIO();
+		$con->connect();
+		$sql = "select * from sysuser order by serial" ;
+		$con->query($sql);
+		$nr = $con->numrows();
+		if($nr == 0){
+			return false ;
+		}
+		$result = array();
+		for($i = 0 ; $i < $nr ; ++ $i){
+			$result[] = $con->fetch_assoc();
+		}
+		return $result;
+	}
+    /*-------------------------------------------------------------------------
+     * ユーザー情報を更新する
+     *------------------------------------------------------------------------*/
+	//	update user
+	function updateUserInfo($serial,$uname,$fname,$pwd,$admin){
+		$con = new DBIO();
+		$con->connect();
+		$uname = strip_tags($uname);
+		$fname = strip_tags($fname);
+
+
+		if($pwd != ""){
+			$sql = "update sysuser set username=? , name=? , password=?,isadmin=? where serial=?";
+			$prm = array($uname,$fname,$this->crypt($pwd),$admin,$serial);
+		}else{
+			$sql = "update sysuser set username=? , name=? ,isadmin=? where serial=?";
+			$prm = array($uname,$fname,$admin,$serial);
+		}
+		$con->query($sql,$prm);
+		
+		return ;
+	}
+    /*-------------------------------------------------------------------------
+     * 新しいユーザーを作成する
+     *------------------------------------------------------------------------*/
+	function createUser($uname,$fname,$pwd,$admin){
+		$con = new DBIO();
+		$con->connect();
+		$uname = strip_tags($uname);
+		$fname = strip_tags($fname);
+		
+
+
+		$sql = "insert into sysuser (username,name,password,isadmin) values (?,?,?,?)";
+		$prm = array($uname,$fname,$this->crypt($pwd),(int)$admin);
+
+		$con->query($sql,$prm);
+		
+		return ;
+	}
+    /*-------------------------------------------------------------------------
+     * ユーザーを削除する
+     *------------------------------------------------------------------------*/
+	function deleteUser($serial){
+		$con = new DBIO();
+		$con->connect();
+		$sql = "delete from sysuser where serial=?";
+		$prm = array($serial);
+		$con->query($sql,$prm);
+	
+		return ;
+	}
+    /*-------------------------------------------------------------------------
+     * 管理者でないユーザーを取得する
+     *------------------------------------------------------------------------*/
+	function getUserList(){
+		$con = new DBIO();
+		$con->connect();
+		$sql = "select serial,name from sysuser where ( isadmin<>1 or isadmin is NULL ) order by serial";
+		return $con->getAll($sql);
+	}
+}
+/* -- end of text ------------------------------------------------------------*/
