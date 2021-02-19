@@ -2,8 +2,7 @@
 
 /**
  *------------------------------------------------------------------------------
- * PDO class 2016/01/05
- *           2016/06/18  Rel 1.7 by Hide    modify TYPO & etc .....
+ * PDO class 2016/01/05 Rel 1.6 by Hide        modify TYPO & etc .....
  *------------------------------------------------------------------------------
  * HOW TO USE
  * ----------
@@ -34,69 +33,49 @@
  *----------------------------------------------------------------------------*/
 class DBIO
 {
-    //	db connect config ----------------------------------------------------------------
-    //	TODO : external configuration
-    private $config = array(
-        'default' => array('dsn' => 'mysql:host=127.0.0.1;dbname=remote;charset=utf8',
-            'user' => 'root',
-            'pass' => ''));
-    //	private  -------------------------------------------------------------------------
-    private $dsn;                //	(D)ata(S)ource(N)ame
-    private $db_user;            //	user
-    private $db_pass;            //	password
-    private $link = false;        //	link status
-    private $dbh;                //	db handler
-    private $sth;                //	db statement
+    // private  -------------------------------------------------------------------------
+    private $dsn;                // (D)ata(S)ource(N)ame
+    private $db_user;            // user
+    private $db_pass;            // password
+    private $link = false;        // link status
+    private $dbh;                // db handler
+    private $sth;                // db statement
+    var $table_name = '';
+    var $pkey_name = 'id';
 
-    /**    constructor
-     *
-     * @param string $target
-     * @return boolean  condition
-     */
-    function __construct($target = 'default')
+    // constructor
+    function __construct()
     {
-        $this->dsn = $this->config[$target]["dsn"];
-        $this->db_user = $this->config[$target]["user"];
-        $this->db_pass = $this->config[$target]["pass"];
-        //logsave("DBIO" , "INIT TARGET (".$target.")");
+        $this->dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8';
+        $this->db_user = DB_USER;
+        $this->db_pass = DB_PASS;
+        //logsave("dao" , "INIT TARGET (".$this->dsn.")");
         return $this->connect();
     }
 
-    /**    connect
-     *
-     * @return boolean
-     */
+    // connect
     function connect()
     {
-        //	already connected
+        // already connected
         if ($this->link) {
             return false;
         }
-        echo $this->dsn;
-
         try {
-            $this->dbh = new PDO($this->dsn, $this->db_user, $this->db_pass,
-                array(
-                    PDO::ATTR_PERSISTENT => true
-                )
-            );
+            $this->dbh = new PDO($this->dsn, $this->db_user, $this->db_pass);
             $this->sth = null;
             $this->link = true;
         } catch (PDOException $e) {
             $this->link = false;
-            logsave("DBIO", "Connection failed (" . $this->dsn . ")");
+            logsave("dao", "Connection failed ({$this->dbh})");
             return false;
         }
         return true;
     }
 
-    /**    close
-     *
-     * @return boolean
-     */
+    // close
     function close()
     {
-        //	db not connect
+        // db not connect
         if (!$this->link) {
             return false;
         }
@@ -107,118 +86,96 @@ class DBIO
         return true;
     }
 
-    /**    bind
-     *
-     * @param type $sql
-     * @param type $params
-     * @return boolean
-     */
-    function sqlbind($sql, $params = NULL)
+    // bind
+    function sqlbind($sql, $params = null)
     {
-        $st_time = microtime(true);                                //	timer
-
-
-        //	db not connect
+        // db not connect
         if (!$this->link) {
             return false;
         }
 
         $this->sth = $this->dbh->prepare($sql);
-        if ($params != NULL) {
-            for ($i = 0; $i < count($params); ++$i) {
-                $this->sth->bindValue(($i + 1), $params[$i]);
+        if ($params != null) {
+            $i=0;
+            foreach($params as $val){
+                // int型とdate型に空文字を入れるとエラーになるので、空だったら、nullをセットするように変更
+                if (is_null($val) || $val === '') {
+                    $this->sth->bindValue(($i + 1), null, PDO::PARAM_NULL);
+                } else {
+                    $this->sth->bindValue(($i + 1), $val, PDO::PARAM_STR);
+                }
+                $i++;
             }
         }
-
         $result = $this->sth->execute();
 
         if ($result === false) {
             $e = $this->sth->errorInfo();
-            print_r($e);
-            echo("PDO_ERROR\n\n");
+            logsave("dao query failed!! ", $e[2] . "(" . $sql . ")");
+            if (DEBUG) {
+                echo $sql;
+                pr($e);
+                exit();
+            }
         }
-
-        $lap = substr((microtime(true) - $st_time), 0, 8);
-        logsave("PDO", "Query : $sql ");
-        logsave("PDO", "Query Time : $lap msec ");
-
         return $result;
     }
 
-    /**    escape
-     *
-     * @param type $str
-     * @return boolean
-     */
+    // escape
     function escape($str)
     {
-        //	db not connect
+        // db not connect
         if (!$this->link) {
             return false;
         }
         return $this->dbh->quote($str);
     }
 
-
-    //	query ( alias : sqlbind )
-    function query($sql, $params = NULL)
+    // query ( alias : sqlbind )
+    function query($sql, $params = null)
     {
         return $this->sqlbind($sql, $params);
     }
 
-    /**    fetch
-     *
-     * @return array  取得データ
-     */
+    // fetch
     function fetch()
     {
-        //	link check
+        // link check
         if (!$this->link) {
             return false;
         }
-        $row = $this->sth->fetch();
 
+        $row = $this->sth->fetch();
         return $row;
     }
 
-    /**    fetch assoc
-     *
-     * @return array    取得データ
-     */
+    // fetch assoc
     function fetch_assoc()
     {
-        //	link check
+        // link check
         if (!$this->link) {
             return false;
         }
-        $row = $this->sth->fetch(PDO::FETCH_ASSOC);
 
-        return $row;
+        return $this->sth->fetch(PDO::FETCH_ASSOC);
     }
 
-    /**    numrows
-     *
-     * @return boolean
-     */
+    // numrows
     function numrows()
     {
-        //	link check
+        // link check
         if (!$this->link) {
             return false;
         }
 
-        //	obsolete function
+        // obsolete function
         return $this->sth->rowCount();
-
     }
 
-    /**    affected rows
-     *
-     * @return boolean
-     */
+    // affected rows
     function affected_rows()
     {
-        //	link check
+        // link check
         if (!$this->link) {
             return false;
         }
@@ -226,18 +183,14 @@ class DBIO
         return $this->sth->rowCount();
     }
 
-    /**    get All result by array
-     *
-     * @param type $sql
-     * @param type $params
-     * @return boolean
-     */
+    // get All result by array
     function getAll($sql, $params = null)
     {
-        //	link check
+        // link check
         if (!$this->link) {
             return false;
         }
+
         $this->sqlbind($sql, $params);
         $row = $this->sth->fetchAll();
         $this->sth->closeCursor();
@@ -245,15 +198,10 @@ class DBIO
         return $row;
     }
 
-    /**    get All result by array ( assoc )
-     *
-     * @param type $sql
-     * @param type $params
-     * @return boolean
-     */
+    // get All result by array ( assoc )
     function getAllAssoc($sql, $params = null)
     {
-        //	link check
+        // link check
         if (!$this->link) {
             return false;
         }
@@ -263,16 +211,25 @@ class DBIO
 
         return $row;
     }
+    // get All result by array ( assoc )
+    // 先頭のカラムをkeyとした3次元配列で返す
+    function getAllAssoc2($sql, $params = null)
+    {
+        // link check
+        if (!$this->link) {
+            return false;
+        }
+        $this->sqlbind($sql, $params);
+        $row = $this->sth->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
+        $this->sth->closeCursor();
 
-    /**    get One result by array
-     *
-     * @param type $sql
-     * @param type $params
-     * @return boolean
-     */
+        return $row;
+    }
+
+    // get One result by array
     function getRow($sql, $params = null)
     {
-        //	link check
+        // link check
         if (!$this->link) {
             return false;
         }
@@ -284,15 +241,10 @@ class DBIO
         return $row;
     }
 
-    /**    get One Result by array (assoc)
-     *
-     * @param type $sql
-     * @param type $params
-     * @return boolean
-     */
+    // get One Result by array (assoc)
     function getRowAssoc($sql, $params = null)
     {
-        //	link check
+        // link check
         if (!$this->link) {
             return false;
         }
@@ -304,16 +256,10 @@ class DBIO
         return $row;
     }
 
-    /**    get One result by Value
-     *
-     * @param type $sql
-     * @param type $params
-     * @param type $key
-     * @return boolean
-     */
+    // get One result by Value
     function getOne($sql, $params = null, $key = 0)
     {
-        //	link check
+        // link check
         if (!$this->link) {
             return false;
         }
@@ -325,12 +271,7 @@ class DBIO
         return $row[$key];
     }
 
-    /**    get Column Name by array
-     *
-     * @param type $sql
-     * @param type $params
-     * @return type
-     */
+    // get Column Name by array
     function getColumn($sql, $params)
     {
         $this->sqlbind($sql, $params);
@@ -344,13 +285,12 @@ class DBIO
         return $columns;
     }
 
-    /** get fields
-     *
-     * @param type $table_name
-     * @return type
-     */
-    function getFields($table_name)
+    // get fields
+    function getFields($table_name = '')
     {
+        if (empty($table_name)) {
+            $table_name = $this->table_name;
+        }
         $result = $this->getAllAssoc("DESC $table_name");
         $arr = array();
         if (!empty($result)) {
@@ -360,5 +300,16 @@ class DBIO
         }
         return $arr;
     }
+
+    // カラムがあるかどうか
+    function hasField($table_name, $colname)
+    {
+        return (!empty($this->getOne("DESCRIBE {$table_name} {$colname}"))) ? true : false;
+    }
+
+    function getLastInsertId()
+    {
+        return $this->dbh->lastInsertId();
+    }
 }
-/* -- end of text ------------------------------------------------------------*/
+

@@ -1,0 +1,426 @@
+<!DOCTYPE html>	
+<html lang="ja"><!-- InstanceBegin template="/Templates/admin.dwt" codeOutsideHTMLIsLocked="false" -->	
+<head>	
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<!-- InstanceBeginEditable name="doctitle" -->
+	<title>レポート詳細</title>
+	<!-- InstanceEndEditable -->	
+<link rel="stylesheet" type="text/css" href="/admin/css/common.css?release=___RELEASE___"/>
+<!-- InstanceBeginEditable name="head" -->
+	<link rel="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js">
+	<link rel="stylesheet" type="text/css" href="/common/css/jquery-ui.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/common/css/modal.css?release=___RELEASE___"/>
+	<style>
+		#drop {
+			width: 300px;
+			height: 100px;
+			padding: 10px;
+			border: 3px solid #595959;
+			overflow: scroll;
+			margin: 0 auto;
+		}
+
+		#consider_files {
+			margin-top: 10px;
+			height: 90px;
+			overflow-y: scroll;
+			border: 1px solid #ccc;
+		}
+		#consider_files > div {
+			cursor: pointer;
+		}
+		.pointer{
+			cursor: pointer;
+		}
+	</style>
+	<!-- InstanceEndEditable -->	
+</head>	
+<body>	
+
+<div id="container">	
+	<header>
+		<div>
+			<h1><a href="/"><img src="/common/img/logo.png" alt="富士経済"></a></h1>
+			<nav id="navigation">
+				<ul class="menu">
+					___SIDE_MENU___
+				</ul>
+			</nav>
+		</div>
+	</header>
+<!-- InstanceBeginEditable name="contents" -->
+
+	<div id="wrapper">
+		<section>
+			
+			<h2>レポート　登録・編集
+				<div class="right">
+					<a href="report.html" class="btn btn_gray">一覧へ戻る</a>
+				</div>
+			</h2>
+			<form method="post">
+				<input type='hidden' id='id' name='id' value='___ID___'>
+
+				<table>
+					<tr>
+						<th width="160">業務コード <span class="must">必須</span><div class="notice">英数字9桁</div></th>
+						<td width="360"><input type='text' id='code' name='code' value='___CODE___'>
+
+						</td>
+						<th width="160">制作部門 <span class="must">必須</span></th>
+						<td>___BRANCH_CD___</td>
+					</tr>
+					<tr>
+						<th>タイトル <span class="must">必須</span></th>
+						<td colspan="3">
+							<input type='text' id='title' name='title' value='___TITLE___' style="width: 500px;">
+						</td>
+					</tr>
+					<tr>
+						<th>カテゴリ1 <span class="must">１のみ必須</span></th>
+						<td>___CATEGORY_CD1___</td>
+						<th>カテゴリ2</th>
+						<td>___CATEGORY_CD2___</td>
+					</tr>
+					<tr>
+						<th>レポート区分 <span class="must">必須</span></th>
+						<td>___TYPE___</td>
+						<th>発行日 <span class="must">必須</span></th>
+						<td><input type='text' id='public_date' name='public_date' value='___PUBLIC_DATE___'></td>
+					</tr>
+					<tr>
+						<th>書籍版/CD-ROM版 <span class="must">必須</span></th>
+						<td><input type='text' id='price' name='price' value='___PRICE___' class="w100"> <span
+								class="unit">円</span></td>
+						<th>在庫</th>
+						<td>___STOCK___</td>
+					</tr>
+					<tr>
+						<th>PDF版</th>
+						<td><input type='text' id='pdf_price' name='pdf_price' value='___PDF_PRICE___' class="w100">
+							<span class="unit">円</span><br>
+							___PDF_PRICE_DISP_TYPE___
+						</td>
+						<th>PDF/データ版</th>
+						<td><input type='text' id='pdf_price_data' name='pdf_price_data' value='___PDF_PRICE_DATA___'
+						           class="w100"> <span class="unit">円</span><br>
+							___PDF_PRICE_DATA_DISP_TYPE___
+						</td>
+					</tr>
+					<tr>
+						<th>PDF版セット</th>
+						<td>
+							<input type='text' id='set_price' name='set_price' value='___SET_PRICE___' class="w100">
+							<span class="unit">円</span>
+							<br>___SET_PRICE_TITLE___
+						</td>
+						<th>PDF/データ版セット</th>
+						<td>
+							<input type='text' id='set_price_data' name='set_price_data' value='___SET_PRICE_DATA___'
+							       class="w100"> <span class="unit">円</span>
+							<br>___SET_PRICE_DATA_TITLE___
+						</td>
+					</tr>
+					<tr>
+                        <th>電子書籍</th>
+                        <td>
+                            <input type='text' id='dbook_price' name='dbook_price' value='___DBOOK_PRICE___' class="w100">
+                            <span class="unit">円</span>
+                        </td>
+						<th>ネットワークパッケージ版</th>
+						<td>
+							<input type='text' id='np_price' name='np_price' value='___NP_PRICE___' class="w100">
+							<span class="unit">円</span>
+                        </td>
+					</tr>
+                    <tr>
+						<th>改訂版 <span class="notice">英数字9桁</span></th>
+						<td colspan="3">
+							<input type='text' id='more_new' name='more_new' value='___MORE_NEW___'>
+							<span class="pointer">___MORE_NEW_TITLE___</span>
+						</td>
+					</tr>
+					<tr>
+						<th>関連レポート 1〜4 <div class="notice">英数字9桁</div></th>
+						<td colspan="3">
+							<table>
+								<tr><td>
+									<input type='text' id='relation_1' name='relation_1' value='___RELATION_1___'>
+									<span class="pointer">___RELATION_1_TITLE___</span>
+								</td></tr>
+								<tr><td>
+									<input type='text' id='relation_2' name='relation_2' value='___RELATION_2___'>
+									<span class="pointer">___RELATION_2_TITLE___</span>
+								</td></tr>
+								<tr><td>
+									<input type='text' id='relation_3' name='relation_3' value='___RELATION_3___'>
+									<span class="pointer">___RELATION_3_TITLE___</span>
+								</td></tr>
+								<tr><td>
+									<input type='text' id='relation_4' name='relation_4' value='___RELATION_4___'>
+									<span class="pointer">___RELATION_4_TITLE___</span>
+								</td></tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<th>概要</th>
+						<td colspan="3">
+							<textarea id='text' name='detail' style="width: 600px; height:80px;">___DETAIL___</textarea>
+						</td>
+					</tr>
+					<tr>
+						<th>目次</th>
+						<td colspan="3">
+							<textarea id='contents' name='contents'
+							          style="width: 600px; height: 300px;">___CONTENTS___</textarea>
+						</td>
+					</tr>
+					<tr>
+						<th>表示画像</th>
+						<td colspan="3">___FILE1___</td>
+					</tr>
+					<tr>
+						<th>サンプル</th>
+						<td colspan="3">___FILE2___</td>
+					</tr>
+					<tr>
+						<th>購入検討サービス</th>
+						<td style="vertical-align: top;">
+							<div id="image_upload_section" style="___CONSIDER_FILES_DISPLAY___">
+								<div id="drop" ondragover="onDragOver(event)" ondrop="onDrop(event)"></div>
+							</div>
+						</td>
+						<td colspan="2" style="vertical-align: top;">
+							<!-- 登録済みのファイル -->
+							___CONSIDER_PREVIEW___
+							<div id="consider_files">
+								___CONSIDER_FILES___
+							</div>
+						</td>
+					</tr>
+
+				</table>
+
+			<div class="btn_box">
+				<input type="text" id="release_status" name="release_status" value="___release_status___" style="display: none;">
+				<div id="js_submit2" class="btn btn_release0 w120">登録のみ(非公開)</div>
+				<div id="js_submit" class="btn btn_release1 w120">登録および公開</div>
+				<input type="hidden" id="back_url" value="report.html">
+			</div>
+			</form>
+		</section>
+	</div>
+
+	<!-- InstanceEndEditable -->
+	<div id="footer_space">space</div>
+</div>
+<footer>
+	<small>&copy; FUJI KEIZAI CO., LTD. All rights reserved.</small>
+</footer>
+<script src="/common/js/jquery.min.js"></script>
+<script src="/admin/js/common.js?release=___RELEASE___"></script>
+<!-- InstanceBeginEditable name="EditJs" -->	
+<script src="/common/js/jquery-ui.min.js"></script>
+<script src="/common/js/modal.js?release=___RELEASE___"></script>
+<script src="/common/js/edit.js?release=___RELEASE___"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script>
+	'use strict';
+
+	//-------------------------------------------------------------
+	//
+	// 購入検討サービス
+	//
+	//-------------------------------------------------------------
+	const txt = 'ファイルをドラッグ＆ドロップしてください。複数ファイルも対応しています。';
+	$('#drop').html(txt);
+	// 業務コードは必須 未入力だったらdragエリアを非表示
+	$('#code').change(function(){
+		if($(this).val()!="" && $(this).val().match(/^[0-9０-９]{9}$/)){
+			$('#image_upload_section').css('display', 'block');
+		} else {
+			$('#image_upload_section').css('display', 'none');
+		}
+	});
+
+	// https://qiita.com/uda0922/items/4e22908ce2acb3a28f29
+	// File APIに対応していない場合はエリアを隠す
+	if (!window.File) {
+		document.getElementById('image_upload_section').style.display = "none";
+	}
+
+	// ブラウザ上でファイルを展開する挙動を抑止
+	function onDragOver(event) {
+		// ブラウザ上でファイルを展開する挙動を抑止
+		event.preventDefault();
+	}
+
+	/**
+	 * Drop領域にドロップした際のファイルのプロパティ情報読み取り処理
+	 */
+	function onDrop(event) {
+		// ブラウザ上でファイルを展開する挙動を抑止
+		event.preventDefault();
+		console.log('onDrop');
+
+		let code = $('#code').val();
+		// 一時ファイル置き場を初期化する
+		$.get(getUrl() + '?action=initialize_temp_dir&code='+code);
+
+		// テキスト
+		$('#drop').html(txt);
+
+		// TODO
+		// ぐるぐるイメージ
+		//showLoadingImg();
+
+		// ドロップされたファイルのfilesプロパティを参照
+		let files = event.dataTransfer.files;
+		for (let i = 0; i < files.length; i++) {
+			// 一件ずつアップロード
+			imageFileUpload(files[i]);
+		}
+	}
+
+	// 購入検討ファイルアップロード
+	function imageFileUpload(f) {
+		let code = $('#code').val();
+		let formData = new FormData();
+		formData.append('image', f);
+		$.ajax({
+			url: getUrl() + '?action=upload_consider&code=' + code,
+			method: 'post',
+			dataType: 'json',
+			data: formData,      //dataにFormDataを指定
+			processData: false,  // Ajaxがdataを整形しない指定
+			contentType: false,  // contentTypeもfalseに指定
+			success: function (file_name) {
+				// テンポラリディレクトリの中身を表示
+				$.get(getUrl() + '?action=get_tmp_file_list&code='+code, function (j_data) {
+					$('#drop').html(j_data);
+				});
+			},
+			error: function (xhr, textStatus, errorThrown) {
+				// エラー処理 なんかでちゃう？
+				//console.log('ajax error', xhr, textStatus, errorThrown);
+			}
+		});
+	}
+
+	// reset
+	$('#js_reset').click(function () {
+		$('#drop').html(txt);
+	});
+	// 購入検討サービスのjpg preview
+	$(document).on('click', '[id^=file_]',function(){
+		let file_name = $(this).attr('id').replace("file_","");
+		let code = $('#code').val();
+		openDialog('<img src="/report/html5/'+code+'/HTML5/pages/'+file_name+'" width="500" style="text-align:center;">', 600);
+	});
+	// 購入検討サービスhtml5 のプレビュー
+	$(document).on('click', '#js_consider_preview', function(){
+		window.open('/trigger.html?code='+$('#code').val());
+	});
+
+	$(function () {
+		//-------------------------------------------------------------
+		// save
+		//-------------------------------------------------------------
+		// 登録のみ(非公開)
+		$('#js_submit2').mouseover(function(){
+			$('#release_status').val(0);
+		});
+		// 登録および公開
+		$('#js_submit').mouseover(function(){
+			$('#release_status').val(1);
+		});
+		//-------------------------------------------------------------
+		// datepicker
+		$('#public_date').datepicker({dateFormat: 'yy/mm/dd',});
+
+		// 半角に
+		$('input[name*=price], #code, #more_new, input[name^=relation_]').change(function () {
+			$(this).val(zenToHan($(this).val()));
+		});
+
+		$('#contents').change(function () {
+			$(this).val($(this).val().replace(/&nbsp;/g, ''));
+		});
+
+		// レポート区分が「市場調査資料」時のみNPプライスは、書籍プライスの２倍
+		$('#price').change(function(){
+			if($('#type').val()=='REPORT'){
+				$('#np_price').val($(this).val()*2);
+			}
+		});
+
+
+		/**
+		 * レポートコード＆タイトル サジェスト
+		 */
+		let tmp = '';
+		$("#more_new, [id^=relation_]").autocomplete({
+			source: "/admin/_action.html?action=get_code_suggest", minLength: 2, delay: 0,
+			select: function(event, ui) {
+				if (ui.item != null) {
+					tmp = ui.item.value.split(':'); // 業務コード：プロジェクト名
+				} else {
+					tmp = '';
+					$(this).next('span').html('');
+				}
+				console.log('select');
+			},
+			close: function(){
+				let elem = $(this);
+				console.log('close');
+				elem.next('span').html('');
+				if(tmp.length>0){
+					// code
+					elem.val(tmp[0]);
+					// タイトル表示
+					let title = tmp[1].split('(');
+					elem.next('span').html(title[0]);
+				} else {
+					$.get(getUrl()+'?action=get_report_title&code='+elem.val(), function(j_data){
+						if(j_data!=""){
+							elem.next('span').html(j_data);
+						}
+					});
+				}
+			}
+		});
+		$("#more_new, [id^=relation_]").click(function(){
+			tmp = '';   // 前回の選択をクリアする
+			$(this).removeClass('error_bg');
+			$(this).parent().find('.error').remove();
+		});
+		$("#more_new, [id^=relation_]").change(function(){
+			let elem = $(this);
+
+			if(elem.val()==''){
+				$(this).next('span').html('');
+			} else {
+				$.get(getUrl()+'?action=get_report_title&code='+elem.val(), function(j_data){
+					if(j_data!=""){
+						elem.next('span').html(j_data);
+					}
+				});
+			}
+		});
+		/**
+		 * タイトルクリックで、レポート詳細表示
+		 */
+		$("#more_new, [id^=relation_]").next('span').click(function(){
+			let code = $(this).prev('input').val();
+			$.get('/admin/_action.html?action=get_report_detail&code='+code, function(j_data){
+				if(j_data!=""){
+					openDialog(j_data, 700);
+				}
+			});
+		});
+	});
+</script>
+<!-- InstanceEndEditable -->
+</body>
+<!-- InstanceEnd --></html>

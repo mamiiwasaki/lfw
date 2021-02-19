@@ -1,0 +1,145 @@
+<!DOCTYPE html>	
+<html lang="ja"><!-- InstanceBegin template="/Templates/admin.dwt" codeOutsideHTMLIsLocked="false" -->	
+<head>	
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<!-- InstanceBeginEditable name="doctitle" -->
+	<title>レポート一覧</title>
+	<!-- InstanceEndEditable -->	
+<link rel="stylesheet" type="text/css" href="/admin/css/common.css?release=___RELEASE___"/>
+<!-- InstanceBeginEditable name="head" -->
+	<link rel="stylesheet" type="text/css" href="/common/css/modal.css?release=___RELEASE___"/>
+	<!-- InstanceEndEditable -->	
+</head>	
+<body>	
+
+<div id="container">	
+	<header>
+		<div>
+			<h1><a href="/"><img src="/common/img/logo.png" alt="富士経済"></a></h1>
+			<nav id="navigation">
+				<ul class="menu">
+					___SIDE_MENU___
+				</ul>
+			</nav>
+		</div>
+	</header>
+<!-- InstanceBeginEditable name="contents" -->
+
+	<div id="wrapper">
+		<section>
+			<h2>レポート一覧</h2>
+			<div>
+				<form method="post" id="search_form" onsubmit="return false;">
+					___BRANCH_CD___
+					___CATEGORY_CD___
+					<input type="text" name="free_word" id="free_word" value="___FREE_WORD___" placeholder="タイトル・内容・コード で検索"
+					       style="width: 300px;">
+					<input type="button" id="js_search" class="btn" value="検索">
+					<input type="button" id="js_reset" class="btn btn_gray" value="クリア">
+				</form>
+			</div>
+			<div class="pager">
+				<ul class="pagination">___PAGER___</ul>
+			</div>
+
+			<!-- カタログ アップロード -->
+			<form id="upload_frm" enctype="multipart/form-data" class="side_btn">
+				<div>
+					___BTN_UPLOAD___
+                    <input type="button" value="CSV抽出" onclick="output_csv();" class="btn">
+					<a href="report_edit.html" class="btn btn_add">新規登録</a>
+				</div>
+			</form>
+
+			<table class="list" id="list_table" style="width:1150px;table-layout:fixed;word-break:break-all">
+				<tr>
+					<th width="30-x">所属</th>
+					<th width="78px">業務コード</th>
+					<th>タイトル</th>
+					<th width="210px">カテゴリー</th>
+					<th width="30px">カバー</th>
+					<th width="30px">目次</th>
+					<th width="30px">サンプル</th>
+					<th width="30px">購入検討</th>
+					<th width="70px">プレス・<br>マーケット</th>
+					<th width="30px">発刊状況</th>
+					<th width="70">ステータス</th>
+					<th width="70">操作</th>
+				</tr>
+				___LIST___
+			</table>
+		</section>
+	</div>
+
+	<!-- InstanceEndEditable -->
+	<div id="footer_space">space</div>
+</div>
+<footer>
+	<small>&copy; FUJI KEIZAI CO., LTD. All rights reserved.</small>
+</footer>
+<script src="/common/js/jquery.min.js"></script>
+<script src="/admin/js/common.js?release=___RELEASE___"></script>
+<!-- InstanceBeginEditable name="EditJs" -->	
+<script src="/common/js/modal.js?release=___RELEASE___"></script>
+<script src="/common/js/list.js?release=___RELEASE___"></script>
+<script>
+	$(function(){
+		'use strict';
+
+		/**
+		 * ファイルアップロード
+		 */
+		$('#js_upload').click(function () {
+			if ($('#upload').val() == "") {
+				openDialog('ファイルを選択してください');
+				return;
+			}
+			// 読み込みイメージ
+			showLoadingImg();
+
+			// フォームデータを取得
+			var formdata = new FormData($('#upload_frm').get(0));
+
+			// POSTでアップロード
+			$.ajax({
+				url: getUrl() + "?action=upload",
+				type: "POST",
+				data: formdata,
+				cache: false,
+				contentType: false,
+				processData: false,
+				dataType: "html"
+			}).done(function (data, textStatus, jqXHR) {
+				if (data == 1) {
+					location.href = getUrl();
+				}
+			}).fail(function (jqXHR, textStatus, errorThrown) {
+				alert("fail");
+			});
+		});
+
+		/**
+		 * ファイルダウンロード
+		 */
+		$('#js_download').click(function () {
+			location.href=getUrl()+'?action=downlowd';
+		});
+
+		// レポート詳細表示
+		$(document).on('click', '.js_code', function(j_data){
+			$.get('/admin/_action.html?action=get_report_detail&code='+$(this).data('code'), function(j_data){
+				if(j_data!=""){
+					openDialog(j_data, 700);
+				}
+			});
+		});
+	});
+
+    // csv出力
+    function output_csv() {
+        location.href = "?action=csv_output&" + $('#search_form').serialize();
+    }
+</script>
+<!-- InstanceEndEditable -->
+</body>
+<!-- InstanceEnd --></html>

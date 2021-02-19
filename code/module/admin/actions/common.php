@@ -2,33 +2,36 @@
 /*-----------------------------------------------------------------------------
  *  Lightweight framework Rev 1.3
  *-----------------------------------------------------------------------------
- *  2009-10-31 : initial version by Hide
- *  2016-01-02 : rebuild
+ * 2009-10-31 : initial version by Hide
+ * 2015-05-12 : rebuild
  *
- *  トップページ
+ * admin / common
  *----------------------------------------------------------------------------*/
-require_once dirname(__FILE__) . '/../config.php';
-require_once(dirname(__FILE__) . '/../config.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "config.php");
 
 class app_main extends ActionBase
 {
-    // initialize
+    /**
+     * @param dataContainer $data
+     * @param userContainer $user
+     * @param factory $factory
+     */
     public function initialize(dataContainer $data, userContainer $user, factory $factory)
     {
-        $this->debug_query = false;
+        $this->debug_echo = false;
         $this->debug_status = false;
-        $this->debug_echo = !true;
         return;
     }
 
-    // dispatch
+    /**
+     * @param dataContainer $data
+     * @param userContainer $user
+     * @param factory $factory
+     * @return bool|void
+     */
     public function dispatch(dataContainer $data, userContainer $user, factory $factory)
     {
-    
-        if($test=0){
-            echo "jikjkjkj";
-        }
-        $this->viewitem['TEST'] = 'kdajglkadfjlsfjal';
+        echo("app1 / common");
         return;
     }
 }

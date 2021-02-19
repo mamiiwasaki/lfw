@@ -22,6 +22,7 @@ require_once FUNCTIONS_DIR . 'debug.inc';                   // debug function
 require_once FUNCTIONS_DIR . 'util.inc';                    // utilities function
 //require_once VENDOR_DIR . 'autoload.php';
 //require_once CLASSES_DIR . "UtilDao.php";                   // DB util
+require_once CLASSES_DIR . "pdo.inc";                   // DB util
 
 date_default_timezone_set('Asia/Tokyo');
 

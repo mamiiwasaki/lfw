@@ -1,0 +1,67 @@
+# access control
+Order Deny,Allow
+#Deny from all
+
+# from Office Wifi
+#allow from 118.238.8.97
+
+# from L2TP
+#allow from 122.1.23.111
+#allow from 153.122.100.33
+
+# from other
+#allow from 113.34.164.123
+#allow from 113.34.164.122
+
+# PHP Settings
+php_value auto_prepend_file     /home/lfw/code/init.php
+php_value session.use_cookies   1
+php_value session.use_trans_sid 0
+php_value upload_max_filesize   10M
+php_value post_max_size         50M
+php_value memory_limit          512M
+php_value max_input_vars        99999
+php_flag magic_quotes_gpc Off
+
+# Basic Auth
+#AuthUserfile /home/lfw/conf/.htpasswd
+#AuthGroupfile /
+#AuthName "Please enter your ID and password"
+#AuthType Basic
+#require valid-user
+
+#<IfModule mod_rewrite.c>
+#RewriteEngine on
+#RewriteCond %{HTTPS} off
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+#</IfModule>
+
+# ErrorDocument
+ErrorDocument 404 /404/index.html
+ErrorDocument 403 /404/index.html
+
+# for maintenance
+#ErrorDocument 503 /maintenance.html
+#<IfModule mod_rewrite.c>
+#  RewriteEngine On
+#  RewriteCond %{REQUEST_URI} !=/maintenance.html
+#  RewriteCond %{REMOTE_ADDR} !=118.238.8.97
+#  RewriteCond %{REMOTE_ADDR} !=122.1.23.104
+#  RewriteCond %{REMOTE_ADDR} !=192.168.0.5
+#  RewriteRule ^.*$ - [R=503,L]
+#</IfModule>
+
+# バージョン情報の隠蔽
+#ServerTokens Prod 
+Header unset "X-Powered-By"
+# httpoxy 対策
+#RequestHeader unset Proxy
+# クリックジャッキング対策
+#Header always append X-Frame-Options SAMEORIGIN
+# XSS対策
+Header set X-XSS-Protection "1; mode=block"
+Header set X-Content-Type-Options nosniff
+# XST対策
+#TraceEnable Off
+# HTTPプロトコルの使用を禁止
+#Header set Strict-Transport-Security 'max-age=315360000'
